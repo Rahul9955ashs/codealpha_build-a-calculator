@@ -1,0 +1,127 @@
+:root {
+    --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1e38 100%);
+    --calc-bg: #1e293b;
+    --display-bg: #0f172a;
+    --btn-bg: #334155;
+    --btn-hover: #475569;
+    --operator-bg: #6366f1;
+    --operator-hover: #4f46e5;
+    --accent-bg: #ef4444;
+    --accent-hover: #dc2626;
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: var(--bg-gradient);
+    padding: 20px;
+}
+
+/* Calculator Container */
+.calculator {
+    width: 100%;
+    max-width: 360px;
+    background-color: var(--calc-bg);
+    border-radius: 24px;
+    padding: 24px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+/* Display Styling */
+.display {
+    background-color: var(--display-bg);
+    padding: 20px;
+    border-radius: 16px;
+    text-align: right;
+    margin-bottom: 20px;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    word-wrap: break-word;
+    word-break: break-all;
+}
+
+.formula {
+    color: var(--text-muted);
+    font-size: 1.1rem;
+    min-height: 1.5rem;
+}
+
+.output {
+    color: var(--text-main);
+    font-size: 2.5rem;
+    font-weight: 600;
+}
+
+/* Buttons Grid Layout */
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+}
+
+.btn {
+    border: none;
+    background-color: var(--btn-bg);
+    color: var(--text-main);
+    font-size: 1.4rem;
+    font-weight: 500;
+    padding: 18px 0;
+    border-radius: 12px;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.1s ease, transform 0.05s ease;
+}
+
+.btn:hover {
+    background-color: var(--btn-hover);
+}
+
+/* Micro-interaction: Mimic mechanical compression */
+.btn:active, .btn.active-key {
+    transform: scale(0.95);
+}
+
+/* Operator Styles */
+.btn.operator {
+    background-color: var(--operator-bg);
+}
+.btn.operator:hover {
+    background-color: var(--operator-hover);
+}
+
+/* Clear & Delete Styles */
+.btn.accent {
+    background-color: #475569;
+    color: #fca5a5;
+}
+.btn.accent:hover {
+    background-color: #576b84;
+}
+
+/* Grid Layout Custom Spans */
+.zero {
+    grid-column: span 2;
+}
+
+.equals {
+    grid-column: 4;
+    grid-row: span 2;
+    height: 100%;
+    background-color: #10b981;
+}
+.equals:hover {
+    background-color: #059669;
+}
