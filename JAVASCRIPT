@@ -1,0 +1,150 @@
+const formulaDisplay = document.getElementById('formula');
+const outputDisplay = document.getElementById('current-output');
+const buttons = document.querySelector('.buttons');
+
+let currentInput = '0';
+let previousInput = '';
+let currentOperator = null;
+let shouldResetDisplay = false;
+
+// Main Click Handling
+buttons.addEventListener('click', (e) => {
+    if (!e.target.matches('button')) return;
+    
+    const btn = e.target;
+    const action = btn.dataset.action;
+    const val = btn.dataset.val;
+
+    handleInput(action, val);
+});
+
+// Main Input Routing Logic
+function handleInput(action, val) {
+    if (!action) {
+        appendNumber(val);
+    } else if (action === 'operator') {
+        chooseOperator(val);
+    } else if (action === 'clear') {
+        clearAll();
+    } else if (action === 'delete') {
+        deleteDigit();
+    } else if (action === 'calculate') {
+        evaluateExpression();
+    }
+    updateDisplay();
+}
+
+function appendNumber(num) {
+    if (currentInput === '0' && num !== '.') {
+        currentInput = num;
+    } else if (shouldResetDisplay) {
+        currentInput = num;
+        shouldResetDisplay = false;
+    } else {
+        // Stop users from entering double periods
+        if (num === '.' && currentInput.includes('.')) return;
+        currentInput += num;
+    }
+}
+
+function chooseOperator(op) {
+    if (currentOperator && !shouldResetDisplay) {
+        evaluateExpression();
+    }
+    previousInput = currentInput;
+    currentOperator = op;
+    shouldResetDisplay = true;
+}
+
+function evaluateExpression() {
+    if (!currentOperator || shouldResetDisplay) return;
+
+    let result;
+    const prev = parseFloat(previousInput);
+    const current = parseFloat(currentInput);
+
+    if (isNaN(prev) || isNaN(current)) return;
+
+    switch (currentOperator) {
+        case '+': result = prev + current; break;
+        case '-': result = prev - current; break;
+        case '*': result = prev * current; break;
+        case '/': 
+            if (current === 0) {
+                result = "Error";
+            } else {
+                result = prev / current; 
+            }
+            break;
+        default: return;
+    }
+
+    // Format output gracefully to fix floating-point bugs (e.g., 0.1 + 0.2)
+    currentInput = result === "Error" ? result : Math.round(result * 1e8) / 1e8;
+    currentOperator = null;
+    previousInput = '';
+    shouldResetDisplay = true;
+}
+
+function deleteDigit() {
+    if (shouldResetDisplay) return;
+    if (currentInput.length === 1 || currentInput === 'Error') {
+        currentInput = '0';
+    } else {
+        currentInput = currentInput.slice(0, -1);
+    }
+}
+
+function clearAll() {
+    currentInput = '0';
+    previousInput = '';
+    currentOperator = null;
+    shouldResetDisplay = false;
+}
+
+function updateDisplay() {
+    outputDisplay.innerText = currentInput;
+    if (currentOperator) {
+        let opSymbol = currentOperator === '*' ? '×' : currentOperator === '/' ? '÷' : currentOperator;
+        formulaDisplay.innerText = `${previousInput} ${opSymbol}`;
+    } else {
+        formulaDisplay.innerText = '';
+    }
+}
+
+// Keyboard Mapping Support
+window.addEventListener('keydown', (e) => {
+    let key = e.key;
+    
+    // Map hardware event aliases to execution matches
+    if (key === 'Enter' || key === '=') {
+        handleInput('calculate');
+        triggerVisualFeedback('=');
+    } else if (key === 'Backspace') {
+        handleInput('delete');
+        triggerVisualFeedback('delete');
+    } else if (key === 'Escape') {
+        handleInput('clear');
+        triggerVisualFeedback('clear');
+    } else if (['+', '-', '*', '/'].includes(key)) {
+        handleInput('operator', key);
+        triggerVisualFeedback(key);
+    } else if (['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '.'].includes(key)) {
+        handleInput(null, key);
+        triggerVisualFeedback(key);
+    }
+});
+
+// Flash UI Active-State on Keypress
+function triggerVisualFeedback(key) {
+    let selector = `button[data-val="${key}"]`;
+    if (key === '=') selector = 'button[data-action="calculate"]';
+    if (key === 'delete') selector = 'button[data-action="delete"]';
+    if (key === 'clear') selector = 'button[data-action="clear"]';
+    
+    const targetButton = document.querySelector(selector);
+    if (targetButton) {
+        targetButton.classList.add('active-key');
+        setTimeout(() => targetButton.classList.remove('active-key'), 100);
+    }
+}
